@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, Pressable, Image, ScrollView, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import axios from 'axios';
 import apiClient from '@/services/apiClient';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { router } from 'expo-router';
@@ -7,19 +8,11 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import { useAuth } from '@/authcontext';
 import createStyles from '@/styles/index.styles';
-import axios from 'axios';
-
 
 interface LoginCredentials {
   email: string;
   password: string;
 }
-
-const TEST_USERS = {
-  ADMIN: { email: 'emiliano@example.com', password: '2205' },
-  PATIENT: { email: 'celina@example.com', password: '2205' },
-  DOCTOR: { email: 'doc@example.com', password: '2205' },
-} as const;
 
 const LoginScreen: React.FC = () => {
   const backgroundColor = useThemeColor({}, 'background');
@@ -84,7 +77,7 @@ const LoginScreen: React.FC = () => {
         'email',
         'role',
       ];
-      
+
       await Promise.all(keys.map(key => SecureStore.deleteItemAsync(key)));
     } catch (error) {
       console.error('Error al limpiar datos:', error);
@@ -94,7 +87,7 @@ const LoginScreen: React.FC = () => {
   const saveUserData = async (userData: any) => {
     try {
       const { token, id, name, surname, email, role } = userData;
-      
+
       const baseItems = {
         token,
         userId: id.toString(),
@@ -114,6 +107,7 @@ const LoginScreen: React.FC = () => {
         await SecureStore.setItemAsync('doctor_id', id.toString());
       } else if (role === 'PATIENT') {
         await SecureStore.setItemAsync('patient_id', id.toString());
+
       }
 
       await SecureStore.setItemAsync('userData', JSON.stringify(userData));
@@ -137,25 +131,34 @@ const LoginScreen: React.FC = () => {
     }
   };
 
-  const handleLogin = async (testCredentials?: LoginCredentials) => {
-    const loginData = testCredentials || credentials;
-
-    if (!testCredentials && !validateCredentials()) return;
+  const handleLogin = async () => {
+    if (!validateCredentials()) return;
 
     setIsLoading(true);
     try {
       await clearAllData();
 
-      const response = await apiClient.post('/login', loginData, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-
+      const response = await apiClient.post(
+        '/login',
+        credentials,
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
       if (response.status === 200 && response.data) {
         if (!response.data.id || !response.data.role) {
           throw new Error('Datos de usuario incompletos en la respuesta');
         }
 
         await saveUserData(response.data);
+
+        if (response.data.role === 'DOCTOR') {
+          const storedDoctorId = await SecureStore.getItemAsync('doctor_id');
+          if (!storedDoctorId) {
+            throw new Error('Error al guardar ID del doctor');
+          }
+        }
+
         await login(response.data);
         handleNavigation(response.data.role);
       }
@@ -165,33 +168,12 @@ const LoginScreen: React.FC = () => {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
         : 'Error inesperado al intentar iniciar sesión';
-      
+
       Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
-  const renderTestLoginButtons = () => (
-    <View style={styles.testButtonsContainer}>
-      {(Object.entries(TEST_USERS) as [keyof typeof TEST_USERS, LoginCredentials][]).map(
-        ([userType, credentials]) => (
-          <Pressable
-            key={userType}
-            style={({ pressed }) => [
-              styles.button,
-              { backgroundColor: pressed ? 'darkblue' : theme.tint },
-            ]}
-            onPress={() => handleLogin(credentials)}
-          >
-            <Text style={styles.buttonText}>
-              Iniciar como {userType.toLowerCase()}
-            </Text>
-          </Pressable>
-        )
-      )}
-    </View>
-  );
 
   return (
     <KeyboardAvoidingView
@@ -264,8 +246,6 @@ const LoginScreen: React.FC = () => {
               <Text style={styles.buttonText}>Ingresar</Text>
             )}
           </Pressable>
-
-          {renderTestLoginButtons()}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

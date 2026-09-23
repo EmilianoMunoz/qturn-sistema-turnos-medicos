@@ -1,0 +1,24 @@
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+*.iml
+
+# Build output and dependencies
+**/node_modules
+**/dist/
+**/build/
+**/target/
+**/.expo/
+
+# Logs and coverage
+*.log
+**/coverage/
+
+# Local presentations and notes
+*.odp

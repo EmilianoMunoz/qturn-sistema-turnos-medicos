@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -21,14 +22,17 @@ import java.util.Date;
 @Component
 public class UserAuthenticationProvider {
 
-    @Value("${security.jwt.token.secret-key:secret-key}")
+    @Value("${security.jwt.token.secret-key}")
     private String secretKey;
 
     private final UserService userService;
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        if (secretKey == null || secretKey.length() < 32) {
+            throw new IllegalStateException("JWT_SECRET must contain at least 32 characters");
+        }
+        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     public String createToken(UserDto user) {
@@ -51,10 +55,8 @@ public class UserAuthenticationProvider {
                 .build();
 
         DecodedJWT decoded = verifier.verify(token);
-
         UserDto user = userService.findByEmail(decoded.getSubject());
 
         return new UsernamePasswordAuthenticationToken(user, null, Arrays.asList(user.getRole()));
     }
-
 }

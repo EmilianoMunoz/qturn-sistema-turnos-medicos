@@ -16,7 +16,6 @@ interface Appointment {
   patientCoverage: string;
 }
 
-const API_URL = 'http://192.168.18.166:8080';
 const PRIMARY_COLOR = 'indigo';
 
 const getAuthToken = async (): Promise<string> => {
@@ -46,10 +45,10 @@ const DateButton: React.FC<{
     style={[styles.dateButton, isSelected && styles.selectedButton]}
     onPress={onPress}
   >
-    <MaterialIcons 
-      name="event" 
-      size={24} 
-      color={isSelected ? PRIMARY_COLOR : textColor} 
+    <MaterialIcons
+      name="event"
+      size={24}
+      color={isSelected ? PRIMARY_COLOR : textColor}
     />
     <Text style={[styles.dateText, { color: isSelected ? PRIMARY_COLOR : textColor }]}>
       {format(date, 'eeee, dd MMMM', { locale: es })}
@@ -112,16 +111,16 @@ const useAppointments = (doctorId: number | null) => {
 
   const fetchAppointments = useCallback(async (date: Date) => {
     if (!doctorId) return;
-    
+
     setIsLoading(true);
     try {
       const token = await getAuthToken();
       const formattedDate = format(date, 'yyyy-MM-dd');
       const response = await apiClient.get(
-        `${API_URL}/appointments/doctor/${doctorId}/appointments`, 
+        `/appointments/doctor/${doctorId}/appointments`,
         {
           params: { date: formattedDate },
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
@@ -146,10 +145,10 @@ const useAppointments = (doctorId: number | null) => {
 const DoctorAppointmentsScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentWeek, setCurrentWeek] = useState<Date[]>([]);
-  
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
-  
+
   const { doctorId } = useAuth();
   const {
     appointments,
@@ -215,7 +214,7 @@ const DoctorAppointmentsScreen: React.FC = () => {
         <Text style={[styles.subtitle, { color: textColor }]}>
           Seleccione una fecha:
         </Text>
-        
+
         <FlatList
           data={currentWeek}
           renderItem={renderDateItem}
@@ -228,7 +227,7 @@ const DoctorAppointmentsScreen: React.FC = () => {
           <Text style={[styles.subtitle, { color: textColor }]}>
             Turnos del día:
           </Text>
-          
+
           {isLoading ? (
             <ActivityIndicator size="large" color={PRIMARY_COLOR} />
           ) : appointments.length > 0 ? (
@@ -248,7 +247,7 @@ const DoctorAppointmentsScreen: React.FC = () => {
       )}
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.weekButton, isPast(addDays(currentWeek[0], -7)) && styles.disabledButton]}
           onPress={() => changeWeek(-7)}
           disabled={isPast(addDays(currentWeek[0], -7))}
@@ -257,7 +256,7 @@ const DoctorAppointmentsScreen: React.FC = () => {
           <Text style={styles.weekButtonText}>Semana Anterior</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.weekButton}
           onPress={() => changeWeek(7)}
         >

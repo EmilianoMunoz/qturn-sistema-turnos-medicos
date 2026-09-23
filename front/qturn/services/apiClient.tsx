@@ -1,11 +1,13 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const apiClient = axios.create({
-  baseURL: 'http://192.168.18.166:8080', 
-  timeout: 10000, 
-});
+export const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL?.trim() || 'http://localhost:8080';
 
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
 
 apiClient.interceptors.request.use(
   async (config) => {
@@ -15,9 +17,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default apiClient;

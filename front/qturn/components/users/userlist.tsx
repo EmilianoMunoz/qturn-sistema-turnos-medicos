@@ -2,8 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import apiClient from '@/services/apiClient';
 import styles from '@/styles/components/users/userlist.styles';
 
 const UserList: React.FC<{ users: any[] }> = ({ users }) => {
@@ -14,7 +13,6 @@ const UserList: React.FC<{ users: any[] }> = ({ users }) => {
   };
 
   const handleDeleteUser = async (userId: number) => {
-    const token = await SecureStore.getItemAsync('token');
     Alert.alert(
       'Eliminar Usuario',
       '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.',
@@ -25,11 +23,9 @@ const UserList: React.FC<{ users: any[] }> = ({ users }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await axios.delete(`http://192.168.18.166:8080/users/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
+              await apiClient.delete(`/users/${userId}`);
               Alert.alert('Usuario eliminado', 'El usuario ha sido eliminado correctamente.');
-              router.push('/(tabs)/home')
+              router.push('/(tabs)/home');
             } catch (error) {
               console.error('Error al eliminar el usuario:', error);
               Alert.alert('Error', 'No se pudo eliminar el usuario.');
@@ -64,6 +60,5 @@ const UserList: React.FC<{ users: any[] }> = ({ users }) => {
     />
   );
 };
-
 
 export default UserList;
