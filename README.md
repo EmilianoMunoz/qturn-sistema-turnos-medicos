@@ -1,106 +1,106 @@
-# QTurn
+# QTurn — Sistema de turnos médicos
 
-A full-stack medical appointment management system with role-based experiences for administrators, doctors, and patients. QTurn combines an Expo/React Native mobile client with a Spring Boot REST API, JWT authentication, and PostgreSQL persistence.
+Plataforma full stack para gestionar turnos médicos con experiencias diferenciadas para administradores, médicos y pacientes. QTurn combina una aplicación móvil desarrollada con Expo y React Native, una API REST con Spring Boot, autenticación JWT y persistencia en PostgreSQL.
 
 <p align="center">
-  <img src="front/qturn/assets/images/logo.png" alt="QTurn logo" width="180" />
+  <img src="front/qturn/assets/images/logo.png" alt="Logo de QTurn" width="180" />
 </p>
 
-## What it demonstrates
+## Qué demuestra este proyecto
 
-- Mobile development with React Native, Expo Router, and TypeScript
-- REST API design using Spring Boot and layered architecture
-- Stateless authentication with Spring Security and JWT
-- Relational persistence with PostgreSQL, JPA, and composite keys
-- Role-oriented workflows for `ADMIN`, `DOCTOR`, and `PATIENT`
-- Reproducible local infrastructure with Docker Compose
-- Secure mobile token storage through Expo SecureStore
+- Desarrollo mobile con React Native, Expo Router y TypeScript.
+- Diseño de una API REST con Spring Boot y arquitectura por capas.
+- Autenticación sin estado mediante Spring Security y JWT.
+- Persistencia relacional con PostgreSQL, JPA y claves compuestas.
+- Flujos diferenciados para los roles `ADMIN`, `DOCTOR` y `PATIENT`.
+- Entorno local reproducible mediante Docker Compose.
+- Almacenamiento seguro del token en el dispositivo con Expo SecureStore.
 
-## Implemented features
+## Funcionalidades implementadas
 
-### Patients
+### Pacientes
 
-- Sign in and manage profile data
-- Browse available appointment times
-- Create, view, reschedule, and cancel appointments
+- Inicio de sesión y gestión de datos personales.
+- Consulta de horarios disponibles.
+- Creación, visualización, reprogramación y cancelación de turnos.
 
-### Doctors
+### Médicos
 
-- Review a daily appointment agenda
-- Configure and manage work schedules
-- Access appointment and patient details
+- Consulta de la agenda diaria de turnos.
+- Configuración y administración de horarios de atención.
+- Acceso a la información de turnos y pacientes.
 
-### Administrators
+### Administradores
 
-- List, create, edit, and remove users
-- Manage role-based user records from the mobile interface
+- Listado, creación, edición y eliminación de usuarios.
+- Gestión de usuarios y roles desde la aplicación móvil.
 
-### Platform
+### Plataforma
 
-- JWT-based authentication with one-hour token expiration
-- Protected API routes and centralized authentication errors
-- PostgreSQL-backed users, schedules, and appointments
-- Light/dark theme support in the mobile application
+- Autenticación JWT con tokens de una hora de duración.
+- Rutas protegidas y tratamiento centralizado de errores de autenticación.
+- Persistencia de usuarios, horarios y turnos en PostgreSQL.
+- Compatibilidad con temas claro y oscuro en la aplicación móvil.
 
-## Architecture
+## Arquitectura
 
 ```text
-Expo / React Native app
-          |
-          | HTTPS + JSON + Bearer JWT
-          v
-Spring Boot REST API
-          |
-          | Spring Data JPA
-          v
-      PostgreSQL
+Aplicación Expo / React Native
+              |
+              | HTTPS + JSON + Bearer JWT
+              v
+       API REST Spring Boot
+              |
+              | Spring Data JPA
+              v
+          PostgreSQL
 ```
 
-The repository is organized as a monorepo:
+El repositorio utiliza una estructura monorepo:
 
 ```text
 .
-├── back/qturn/       # Java 17 + Spring Boot API
-├── front/qturn/      # Expo + React Native mobile client
-├── compose.yml       # PostgreSQL and API services
-└── .env.example      # Local Docker configuration template
+├── back/qturn/       # API con Java 17 y Spring Boot
+├── front/qturn/      # Aplicación móvil Expo y React Native
+├── compose.yml       # Servicios de PostgreSQL y la API
+└── .env.example      # Plantilla de configuración local
 ```
 
-## Technology stack
+## Tecnologías
 
-| Area | Technologies |
+| Área | Tecnologías |
 | --- | --- |
 | Mobile | React Native, Expo, Expo Router, TypeScript |
 | Backend | Java 17, Spring Boot 3, Spring Security, Spring Data JPA |
-| Authentication | JWT, BCrypt, Expo SecureStore |
-| Database | PostgreSQL |
-| Mapping/tooling | MapStruct, Lombok, Maven |
-| Infrastructure | Docker, Docker Compose |
-| Testing | JUnit, Spring Boot Test, Jest, React Test Renderer |
+| Autenticación | JWT, BCrypt, Expo SecureStore |
+| Base de datos | PostgreSQL |
+| Mapeo y herramientas | MapStruct, Lombok, Maven |
+| Infraestructura | Docker, Docker Compose |
+| Pruebas | JUnit, Spring Boot Test, Jest, React Test Renderer |
 
-## Run locally
+## Ejecución local
 
-### Requirements
+### Requisitos
 
-- Docker Engine with Docker Compose
-- Node.js 20+ and npm
-- Expo Go, an Android/iOS emulator, or a web browser
+- Docker Engine con Docker Compose.
+- Node.js 20 o superior y npm.
+- Expo Go, un emulador Android/iOS o un navegador web.
 
-### 1. Start PostgreSQL and the API
+### 1. Iniciar PostgreSQL y la API
 
 ```bash
 cp .env.example .env
 ```
 
-Change `POSTGRES_PASSWORD` and set `JWT_SECRET` to a random value of at least 32 characters, then run:
+Modificar `POSTGRES_PASSWORD` y asignar a `JWT_SECRET` un valor aleatorio de al menos 32 caracteres. Luego ejecutar:
 
 ```bash
 docker compose up --build
 ```
 
-The API will be available at `http://localhost:8080`. Its health endpoint is `GET /actuator/health`.
+La API estará disponible en `http://localhost:8080`. El estado del servicio puede consultarse mediante `GET /actuator/health`.
 
-### 2. Start the mobile client
+### 2. Iniciar la aplicación móvil
 
 ```bash
 cd front/qturn
@@ -109,68 +109,68 @@ npm ci
 npm start
 ```
 
-Set `EXPO_PUBLIC_API_URL` according to the runtime:
+Configurar `EXPO_PUBLIC_API_URL` según el entorno utilizado:
 
-- Web/iOS simulator: `http://localhost:8080`
-- Android emulator: `http://10.0.2.2:8080`
-- Physical device: the development computer's LAN address, for example `http://192.168.1.20:8080`
+- Navegador o simulador iOS: `http://localhost:8080`.
+- Emulador Android: `http://10.0.2.2:8080`.
+- Dispositivo físico: la dirección de red local de la computadora, por ejemplo `http://192.168.1.20:8080`.
 
-The device and API host must be reachable from the same network when using Expo Go.
+Al utilizar Expo Go, el dispositivo y la computadora que ejecuta la API deben encontrarse en la misma red.
 
-## Backend without Docker
+## Backend sin Docker
 
 ```bash
 cd back/qturn
 export DB_URL=jdbc:postgresql://localhost:5432/qturn_db
 export DB_USERNAME=qturn
-export DB_PASSWORD=your-password
-export JWT_SECRET=replace-with-at-least-32-random-characters
+export DB_PASSWORD=tu-contraseña
+export JWT_SECRET=reemplazar-por-al-menos-32-caracteres-aleatorios
 ./mvnw spring-boot:run
 ```
 
-Additional configuration is available through `SERVER_PORT`, `JPA_DDL_AUTO`, and `JPA_SHOW_SQL`.
+También pueden configurarse las variables `SERVER_PORT`, `JPA_DDL_AUTO` y `JPA_SHOW_SQL`.
 
-## Main API routes
+## Rutas principales de la API
 
-All routes except login and health checks require `Authorization: Bearer <token>`.
+Todas las rutas, excepto el inicio de sesión y las comprobaciones de estado, requieren el encabezado `Authorization: Bearer <token>`.
 
-| Method | Route | Purpose |
+| Método | Ruta | Descripción |
 | --- | --- | --- |
-| `POST` | `/login` | Authenticate and issue a JWT |
-| `POST` | `/register` | Register a user from an authenticated workflow |
-| `GET/PUT/DELETE` | `/users/...` | Manage user records |
-| `POST` | `/appointments` | Create an appointment |
-| `GET` | `/appointments/available-times` | List available time slots |
-| `GET` | `/appointments/doctor/{doctorId}/appointments` | Read a doctor's daily agenda |
-| `PUT/DELETE` | `/appointments/{appointmentId}` | Reschedule or cancel an appointment |
-| `GET/POST/PUT/DELETE` | `/work-schedules/...` | Manage doctor schedules |
+| `POST` | `/login` | Autenticar un usuario y emitir un JWT. |
+| `POST` | `/register` | Registrar un usuario desde un flujo autenticado. |
+| `GET/PUT/DELETE` | `/users/...` | Administrar usuarios. |
+| `POST` | `/appointments` | Crear un turno. |
+| `GET` | `/appointments/available-times` | Consultar horarios disponibles. |
+| `GET` | `/appointments/doctor/{doctorId}/appointments` | Consultar la agenda diaria de un médico. |
+| `PUT/DELETE` | `/appointments/{appointmentId}` | Reprogramar o cancelar un turno. |
+| `GET/POST/PUT/DELETE` | `/work-schedules/...` | Administrar horarios de atención. |
 
-## Validation
+## Validación del proyecto
 
 ```bash
 # Backend
 cd back/qturn
-JWT_SECRET=development-test-secret-at-least-32-characters ./mvnw test
+JWT_SECRET=secreto-de-prueba-con-al-menos-32-caracteres ./mvnw test
 
-# Mobile client
+# Aplicación móvil
 cd front/qturn
 npm ci
 npx tsc --noEmit
 npm test
 ```
 
-## Project status
+## Estado y próximos pasos
 
-QTurn is a functional academic full-stack project and portfolio case study. The core user, authentication, appointment, and schedule flows are implemented. Before production use, the next priorities are:
+QTurn cuenta con los flujos principales de usuarios, autenticación, turnos y horarios de atención. Para avanzar hacia un entorno productivo, las siguientes mejoras recomendadas son:
 
-- enforce resource ownership and role authorization at method level;
-- expand integration and end-to-end test coverage;
-- add database migrations instead of automatic schema updates;
-- complete waiting-list, appointment-history, and notification modules;
-- add observability, rate limiting, and a production deployment profile.
+- reforzar la autorización por rol y la propiedad de cada recurso;
+- ampliar la cobertura de pruebas de integración y extremo a extremo;
+- incorporar migraciones de base de datos en lugar de actualización automática del esquema;
+- completar los módulos de lista de espera, historial de turnos y notificaciones;
+- agregar observabilidad, limitación de solicitudes y un perfil de despliegue productivo.
 
-The current source tree contains no production credentials or demo passwords. If this project was previously shared with local credentials, rotate them before reuse.
+El código actual no incluye credenciales productivas ni contraseñas de demostración. Si una versión anterior del proyecto fue compartida con credenciales locales, deben rotarse antes de volver a utilizarlas.
 
-## Author
+## Autor
 
-Developed by **Emiliano Muñoz** as an advanced Software Engineering academic project.
+Desarrollado por **Emiliano Muñoz**.
