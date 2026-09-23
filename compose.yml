@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-qturn_db}
+      POSTGRES_USER: ${POSTGRES_USER:-qturn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - qturn-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qturn} -d ${POSTGRES_DB:-qturn_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./back/qturn
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-qturn_db}
+      DB_USERNAME: ${POSTGRES_USER:-qturn}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      JWT_SECRET: ${JWT_SECRET:-development-only-secret-change-me-now}
+      JPA_DDL_AUTO: update
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  qturn-postgres:
